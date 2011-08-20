@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="cache-control" content="no-cache" />
+<meta http-equiv="expires" content="0" />
+
+<title>devi Script Maker</title>
+<link href="deviScriptMaker.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="code/jquery.min.js"></script>
+<script type="text/javascript" src="code/jqueryui.min.js"></script>
+<!--- ScriptMaker -->
+<script type="text/javascript" src="code/devi_src/devi.Core.js"></script>
+<script type="text/javascript" src="code/devi_src/devi.Loader.UNUSED.js"></script>
+<!--- //end -->
+<script type="text/javascript" src="code/shortcut.js"></script>
+<script type="text/javascript">
+$(function() {
+		devi.debug('Initializing...');
+		devi.Loader.init();
+});
+</script>
+<script type="text/javascript">
+var iniTitle = 'Welcome to LSLGen;';
+var iniMessage = '<p>Hello, this tool is in a very early preview and we\'re doing daily improvements so the code may stop working at any time or some features as the \'Help\' button may not work at all.</p><p>Please take time to report any bug or suggest a feature by email to devi@foravatars.com.</p><p>Thanks and enjoy! :)<br/>The devi team.</p><span id="Changelog" style="float:right" class="item BTN"><img src="img/icons/lifebuoy.png"  />Change log</span>';
+var changeLog = '<ul><li><p><strong>21/07/2010: Revision 5 to 6</strong></p><ul><li>[BUG] Fixed double close/message when loading a script.</li><li>[IMPROVEMENT] Unnecessary code removed.</li></ul></li></ul>';
+
+var System = 'http://foravatars.com/sandbox/lsl_source/';
+/* Future: var detectionTags[] = ['A1','[detected-name] [detected-id] [detected-position]']; */
+
+var subButtons    = '<img title="Help" class="help_button" src="img/icons/help.png" /><img title="Delete" class="del_button" src="img/icons/bin_closed.png" /><img title="Move" class="move_button" src="img/icons/selection_select.png" />';
+var colorDefault  = '<div class="colorPicker">&nbsp;<input type="hidden" id="color" name="color" value="1,0,0" /></div>';
+var vectorDefault = '<input name="x" rel="num" title="X Axis" type="text" class="smallInput" maxlength="10" /> <input name="y" rel="num" title="Y Axis" type="text" class="smallInput" maxlength="10" /> <input name="z" rel="num" title="Z Axis" type="text" class="smallInput" maxlength="10" />';
+var linkDefault   = '<input name="chan" rel="num" title="Link Number" type="text" size="3" maxlength="5" /> <input name="string" rel="txt" title="Link Text" type="text" size="8" maxlength="100" /> <input name="id" rel="txt" title="Link UUID" type="text" size="8" maxlength="100" />';
+var inputDefault  = '<input name="text" rel="txt" type="text" size="12" maxlength="100" />';
+var inputNumDefault = '<input name="num" rel="num" type="text" size="12" maxlength="100" />';
+var chatDefault   = '<input name="chan" rel="num" title="Channel" type="text" class="smallInput" maxlength="100" /> <input name="string" rel="txt" type="text" title="Text" size="10" maxlength="100" />';
+var checkDefault  = '<input name="check" type="checkbox" />';
+
+/* ERRORS & DIALOGS */
+
+var saveTitle  = 'Save Script:';
+var saveScript = '<p>Script Title: <input id="title" type="text" /></p><p>Short description: <input id="desc" type="text" /></p><p>Creator name: <input id="creator" type="text" /></p><span id="SaveScript" style="float:right" class="item BTN"><img src="img/icons/disk.png"  />Save</span>';
+var saveCode = '<p>Your code have been saved, load it with this string:</p>';
+var loadTitle = 'Load:';
+var loadCode = '<p style="color:yellow">Warning: Loading a script will remove anything in the current sandbox! Make sure you save it before loading a new code.</p><p>Instert the script code to load:</p><p><input id="ScriptCode" type="text" /></p><span id="LoadCode" style="float:right" class="item BTN"><img src="img/icons/page_white_get.png"  />Load</span>';
+var loadArena = '<p>Setting up arena. Please wait...</p>';
+var loadFinish = '<p><img src="img/icons/accept.png"> Script loaded.</p>';
+
+var COMPILE = 'Compiler';
+var COMPILE_DONE = '<p><img src="img/icons/accept.png" /> Script compiled.</p>';
+var BUILD = 'Build';
+var BUILD_SETTINGS = '<p>Click build to begin, if you want comments about what each function does in the script, check the Comments box.</p><span id="BuildScript" class="item BTN"><img src="img/icons/hammer.png" />Build</span>';
+var BUILDING = '<p align="center">Building script...</p>';
+var CODE = 'This is your script:';
+
+var ERROR_COMPILE  = 'Compiler error:';
+var ERROR_EMPTY    = '<img src="img/icons/.png" /> The arena is empty, nothing to compile.';
+var ERROR_NUM_TYPE = '<img src="img/icons/error.png" /> This field must contain a number and a string was given: \'';
+var ERROR_BUILD    = 'Build console:';
+var FILL_FIELDS    = '<br/><small style="color:yellow">[One or more fields empty.]</small>';
+var LOADING        = '<p align="center"><img src="img/ajax-loader.gif" /></p>';
+var ERROR_COMPILE_FIRST = '<img src="img/icons/error.png" /> Compile code first.';
+
+</script>
+
+<!--- Check icons credits at: http://foravatars.com/lsl/img/icons/README.txt -->
+
+<script type="text/javascript" src="code/colorpicker/colorpicker.js"></script>
+<link href="colorpicker.css" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+<div class="cover_bg">
+	<div class="lslDialog">
+		<div id="lsl_GlobalSelectors">
+			<span id="dialog_close"><img src="img/icons/cancel.png" /></span>
+		</div>
+		<span class="dialog_head"></span>
+		<span class="dialog_box">
+        </span>
+	</div>
+</div>
+
+<div id="lslContainer">
+  <div id="lsl_Sandbox">
+	<div id="lsl_Toolbar">
+		Script Sandbox
+		<div id="lsl_GlobalSelectors">
+			<span id="lslHelp" class="item BTN"><img src="img/icons/exclamation.png" />Help</span>
+			<span id="lslLoad" class="item BTN"><img src="img/icons/page_white_get.png" />Load</span>
+			<span id="lslCompile" class="item BTN"><img src="img/icons/application_view_xp_terminal.png" />Compile</span>
+			<span id="lslSave" class="item BTN"><img src="img/icons/disk.png" />Save</span>
+			<span id="lslBuild" class="item BTN"><img src="img/icons/hammer.png" />Build</span>
+		</div>
+	</div>
+	<div id="lsl_Arena" class="startDrop">
+		<span class="helper">Drop here</span>
+	</div>
+  </div>
+  <div id="lsl_Palette">
+    <h3><a class="none" href="#">Events</a></h3>
+    <div class="none">
+    	<span id="Z1" class="EVNLSL item">At start</span>
+    	<span id="Z2" class="EVNLSL item">When I'm Rezzed</span>
+        <span id="Z3" class="EVNLSL item">When I'm Touched</span>
+        <span id="Z4" class="EVNLSL item">When I'm Bumped</span>
+        <span id="Z5" class="EVNLSL item">Listen</span>
+		<span id="Z6" class="EVNLSL item">In a repeating timer</span>
+    </div>
+    <h3><a class="none" href="#">Communication</a></h3>
+    <div class="none">
+    	<span id="A1" rel="[chat] *channel is optional" class="CMNLSL item">Say</span>
+    	<span id="A2" rel="[chat] *channel is optional" class="CMNLSL item">Shout</span>
+        <span id="A3" rel="[chat] *channel is optional" class="CMNLSL item">Whisper</span>
+        <span id="A4" rel="[chat] *channel is optional" class="CMNLSL item">Region</span>
+		<span id="A5" rel="[input]" class="CMNLSL item">Say to me</span>
+        <span id="A6" rel="[chat]" class="CMNLSL item">Link</span>
+    </div>
+    <h3><a class="none" href="#">Movement</a></h3>
+    <div class="none">
+    	<span id="B1" rel="Position: [vector] [check]*from local" class="MVNLSL item">Go to</span>
+        <span id="B2" rel="Position: [vector] [check]*from local" class="MVNLSL item">Fly to</span>
+        <span id="B3" rel="Position: [vector]" class="MVNLSL item">Look at</span>
+        <span id="B4" rel="Degrees: [num]°" class="MVNLSL item">Rotate</span>
+    </div>
+    <h3><a class="none" href="#">Style</a></h3>
+    <div class="none">
+    	<span id="C1" rel="Color: [color] [check]*random Face: [num] [check]*all" class="STSLSL item">Change color</span>
+        <span id="C2" rel="Texture name/uuid: [input] Face: [num] [check]*all" class="STSLSL item">Change texture</span>
+        <span id="C3" rel="[alpha] Face: [num]" class="STSLSL item">Transparency</span>
+    </div>
+    <h3><a class="none" href="#">Misc</a></h3>
+    <div class="none">
+    	<span id="D1" rel="Text: [input] Color: [color] Transparency: [alpha]" class="MSCLSL item">Set Text</span>
+        <span id="D2" rel="Item name: [input] User target: [target]" class="MSCLSL item">Give Something</span>
+        <span id="D3" rel="URL: [input] Text: [input] User target: [target]" class="MSCLSL item">Load URL</span>
+        <span id="D4" rel="Sound name inside object: [input] Volume: [picker]" class="MSCLSL item">Play sound</span>
+    </div>
+	<h3><a class="none" href="#">Helper</a></h3>
+	<div class="none">
+		<span id="E1" rel="[if]" class="HLPLSL item">If..</span>
+		<span id="E2" rel="[num] seconds" class="HLPLSL item">Wait</span>
+		<span id="E3" rel="" class="HLPLSL item">Die</span>
+		<span id="E3" rel="[num] seconds" class="HLPLSL item">Set Timer</span>
+	</div>
+  </div>
+</div>
+</body>
+</html>
